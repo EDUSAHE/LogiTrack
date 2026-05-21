@@ -1,56 +1,112 @@
 package com.edusahe.logitrack.models;
 
+
 import java.util.Random;
 
-public class Envio {
 
-    private int idEnvio;
-    private int idCliente;
-    private float weight;
-    private final String TRACKING_GUIDE;
+public abstract class Envio implements Rastreable{
 
-    public Envio(int idEnvio, int idCliente, float weight){
-        this.idEnvio = idEnvio;
-        this.idCliente = idCliente;
-        this.weight = weight;
-        TRACKING_GUIDE = trackingGuideGenerator();
+    private Cliente client;
+    private Paquete packet;
+    static int trackingNumber = 0;
+    private Direccion originAddress;
+    private Direccion destinationAddress;
+    private EstadoEnvio shippingState;
+    //Medidas estandar
+    private float baseShippingRate = 65.2F;
+    private float costExtraWeight = 12.0F;
+    private float baseLarge = 30.0F;
+    private float baseWidth = 30.0F;
+    private float baseHeight = 30.0F;
+    private float baseWeight = 3.0F;
+
+    public Envio(Cliente client, Paquete packet, Direccion originAddress, Direccion destinationAddress) {
+        this.client = client;
+        this.packet = packet;
+        this.originAddress = originAddress;
+        this.destinationAddress = destinationAddress;
+        setInitialState();
+        trackingNumber++;
     }
 
-    public int getIdEnvio() {
-        return idEnvio;
+    public Cliente getClient() {
+        return client;
     }
 
-    public void setIdEnvio(int idEnvio) {
-        this.idEnvio = idEnvio;
+    public void setClient(Cliente client) {
+        this.client = client;
     }
 
-    public int getIdCliente() {
-        return idCliente;
+    public Paquete getPacket() {
+        return packet;
     }
 
-    public void setIdCliente(int idCliente) {
-        this.idCliente = idCliente;
+    public void setPacket(Paquete packet) {
+        this.packet = packet;
     }
 
-    public float getWeight() {
-        return weight;
+    public Direccion getOriginAddress() {
+        return originAddress;
     }
 
-    public void setWeight(float weight) {
-        this.weight = weight;
+    public void setOriginAddress(Direccion originAddress) {
+        this.originAddress = originAddress;
     }
 
-    public String getTrackingGuide() {
-        return TRACKING_GUIDE;
+    public Direccion getDestinationAddress() {
+        return destinationAddress;
     }
 
-    private String trackingGuideGenerator(){
-        Random rand = new Random();
-        int min = 100000000;
-        int max = 999999999;
-        char letra1 = (char) (rand.nextInt(26) + 'A');
-        char letra2 = (char) (rand.nextInt(26) + 'A');
-        int randnum = rand.nextInt((max - min) + 1) + min;
-        return randnum + "" + letra1 + "" + letra2;
+    public void setDestinationAddress(Direccion destinationAddress) {
+        this.destinationAddress = destinationAddress;
+    }
+
+    public EstadoEnvio getShippingState() {
+        return shippingState;
+    }
+
+    public void setShippingState(EstadoEnvio shippingState) {
+        this.shippingState = shippingState;
+    }
+
+    public static int getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public float getBaseShippingRate() {
+        return baseShippingRate;
+    }
+
+    public void setBaseShippingRate(float baseShippingRate) {
+        this.baseShippingRate = baseShippingRate;
+    }
+
+    @Override
+    public void setInitialState() {
+        this.shippingState = INITIAL_STATE;
+    }
+
+    @Override
+    public void updateState(EstadoEnvio state) {
+        this.shippingState = state;
+    }
+
+    @Override
+    public EstadoEnvio getState() {
+        return this.shippingState;
+    }
+
+    public float calculateShippingCost(){
+        float finalCost = 0.0F;
+        float finalWeight = Math.max(this.packet.calculateVolumetricWeight(), this.packet.getWeight());
+        if(this.baseLarge <= this.packet.getLarge() && this.baseWidth <= this.packet.getWidth() && this.baseHeight <= this.packet.getHeight() && this.baseWeight <= this.packet.getWeight()){
+            return baseShippingRate;
+        }
+        else{
+            finalWeight = finalWeight - this.baseWeight;
+            finalCost = finalCost + this.baseShippingRate;
+            finalCost = finalCost + (finalWeight * this.costExtraWeight);
+            return finalCost;
+        }
     }
 }

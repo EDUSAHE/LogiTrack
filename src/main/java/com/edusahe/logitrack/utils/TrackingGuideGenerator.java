@@ -1,6 +1,7 @@
 package com.edusahe.logitrack.utils;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class TrackingGuideGenerator {
     private TrackingGuideGenerator() {
@@ -8,9 +9,13 @@ public class TrackingGuideGenerator {
     }
 
     public static String trackingGuideGenerator() {
-        LocalDateTime now = LocalDateTime.now();
-        //System.out.println(now.toString());
-        return now.toString();
+        return trackingGuideWithDate(LocalDateTime.now());
     }
+
+    public static String trackingGuideWithDate(LocalDateTime now) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyyHHmmss");
+        return "LTK-" + now.format(formatter);
+    }
+
 
 }

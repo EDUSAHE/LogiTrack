@@ -1,29 +1,21 @@
 package com.edusahe.logitrack.models;
 
-public class Cliente {
+public class Cliente implements Comparable<Cliente> {
 
-    private int idCliente;
     private String name;
     private String lastName;
     private String email;
     private String phoneNumber;
     private String address;
 
-    public Cliente(int idCliente, String name, String lastName, String email, String phoneNumber, String address) {
-        this.idCliente = idCliente;
+    public Cliente(){}
+
+    public Cliente(String name, String lastName, String email, String phoneNumber, String address) {
         this.name = name;
         this.lastName = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.address = address;
-    }
-
-    public int getIdCliente() {
-        return idCliente;
-    }
-
-    public void setIdCliente(int idCliente) {
-        this.idCliente = idCliente;
     }
 
     public String getName() {
@@ -64,5 +56,16 @@ public class Cliente {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getFullName() {
+        return name + " " + lastName;
+    }
+
+    @Override
+    public int compareTo(Cliente o) {
+        String actualClientFullName = this.name + " " + this.lastName;
+        String oClientFullName = o.getName() + " " + o.getLastName();
+        return actualClientFullName.compareTo(oClientFullName);
     }
 }
